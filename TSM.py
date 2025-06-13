@@ -1,11 +1,5 @@
-with open('data_tsp.txt', 'r') as f:
-    data = f.read()
-
-data = data.split('\n')
-data = [line.split()[1:] for line in data if line.strip()] 
-data = [[float(num) for num in line] for line in data]
-
 import random
+import math
 
 class TSM:
     def __init__(self, data, population_size=100, seed=None, elite_size_factor=0.1, mutation_rate=0.1, 
@@ -27,13 +21,13 @@ class TSM:
         self.__calculate_distances__()
         self.population = []
         self.fitness = []
-        self.__initialize_population__()
 
     def __get_data__(self):
         return self.data
 
     def __calculate_distance__(self, point1, point2):
-        return ((point1[0] - point2[0]) ** 2 + (point1[1] - point2[1] ** 2)) ** 0.5
+        distance = math.sqrt((point1[0] - point2[0]) ** 2 + (point1[1] - point2[1]) ** 2)
+        return distance
 
     def __calculate_distances__(self):
         for i in range(self.n_of_points):
@@ -103,12 +97,17 @@ class TSM:
     def __sort_population__(self):
         self.population = sorted(self.population, key=self.__calculate_fitness__)
 
-    def run(self):
+    def run(self, print_progress=False):
         random.seed(self.seed)
+        self.__initialize_population__()
+
         for _ in range(self.max_generations):
             new_population = []
             self.__calculate_population_fitness__()
             self.__sort_population__()
+
+            if print_progress:
+                print("Best solution so far:", self.best_solution, "with cost:", self.__calculate_fitness__(self.best_solution))
 
             new_population.extend(self.population[:self.elite_size])
 
@@ -121,6 +120,7 @@ class TSM:
                     new_population.append(self.__mutate__(parent.copy()))
 
             self.population = new_population
+
 
         self.__calculate_population_fitness__()
         return self.best_solution, self.__calculate_fitness__(self.best_solution)
