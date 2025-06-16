@@ -1,10 +1,10 @@
 import random
 import math
-import time
+import matplotlib.pyplot as plt
 
 
 class TSM:
-    def __init__(self, data, population_size=100, seed=None, elite_size_factor=0.1, mutation_rate=0.1,
+    def __init__(self, data, population_size=50, seed=None, elite_size_factor=0.1, mutation_rate=0.1,
                  max_generations=1000, crossover_rate=0.7, mating_pool_size_factor=0.5):
 
         self.data = data
@@ -54,8 +54,7 @@ class TSM:
             start_point = self.__get_random_point(unvisited)
             unvisited.remove(start_point)
 
-            distances = {(start_point, j)
-                          : self.distances[start_point][j] for j in unvisited}
+            distances = {(start_point, j)                         : self.distances[start_point][j] for j in unvisited}
             # Prim's algorithm to find the MST
             while unvisited:
                 min_key = min(distances, key=distances.get)
@@ -146,8 +145,8 @@ class TSM:
         self.population = sorted(
             self.population, key=self.__calculate_fitness__)
 
-    def run(self, print_progress=False):
-        # Output: best solution, cost of the best solution, optimality metric * cost
+    def run(self, print_progress=False, plot_results=False):
+        # Output: best solution, cost of the best solution, optimality metric cost, optimality percentage gap
         random.seed(self.seed)
         self.__initialize_population__()
 
@@ -176,4 +175,4 @@ class TSM:
         best_sol_fitness = self.__calculate_fitness__(self.best_solution)
         opt_gap = (best_sol_fitness - self.optimality_metric) / \
             self.optimality_metric
-        return self.best_solution, best_sol_fitness, opt_gap
+        return self.best_solution, best_sol_fitness, self.optimality_metric, opt_gap
